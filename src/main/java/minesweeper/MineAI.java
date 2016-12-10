@@ -3,31 +3,30 @@ package minesweeper;
 
 public class MineAI {
 	Minesweeper minesweeper;
-	
 	MineReader fieldReader;
 
-
-    int threshhold = 2;
+	int threshhold = 3;
+	int coord[] = new int[2];
 
 	int[][] guessElligible;
 	boolean fieldChanged = false;
-	
+
 	public int numGuesses;
 	public int lastNumGuesses;
 	public int numIterations;
 	public int bombsCleared;
-	
+
 	public int flagEvents;
 	public int clearEvents;
-	
+
 	long startTime;
 	long endTime;
-	
+
 	public MineAI(Minesweeper minesweeper){
 		this.minesweeper = minesweeper;
 		fieldReader = new MineReader(this.minesweeper);
 	}
-	
+
 	public void initialize()
 	{
 		endTime=startTime;
@@ -40,14 +39,13 @@ public class MineAI {
 	}
 	public void mainLoop()
 	{
-        int[][] ticketArray = new int[MineReader.rows][MineReader.columns];
 
 		while(!fieldReader.won && !fieldReader.dead)
 		{
 			System.out.println("\n ITERATING AGAIN: FIELD CHANGE STATUS: "+fieldChanged+"");
-            processeEntireField();
-            makeMove(ticketArray);
-        }
+			processeEntireField();
+			//makeMove();
+		}
 		fieldReader.updateField();
 		System.out.print("DONE!" + " --STATUS: ");
 		if(fieldReader.dead)
@@ -57,21 +55,22 @@ public class MineAI {
 		System.out.println("stats: " + numIterations +" iterations with "+numGuesses
 				+" guesses. Time: " + (double)(endTime-startTime)/1000.0 + " sec");
 	}
-	
+
 	public void processeEntireField()
 	{
 		flagEvents=0;
 		clearEvents=0;
 		numIterations++;
+		int[][] ticketArray = new int[fieldReader.columns+2][fieldReader.rows+2];
 		if(fieldChanged)
 		{
 			fieldChanged=false;
 			//fieldReader.updateField();
 			//fieldReader.printField();
-			
+
 			System.out.println("processing field");
 			processField();
-			
+
 			//fieldReader.printField();
 		}
 		else
@@ -79,17 +78,20 @@ public class MineAI {
 			fieldReader.updateField();
 			System.out.println("processing field");
 			processField();
-			
-			
-			if(!fieldChanged && !fieldReader.dead && !fieldReader.won)
-				digRandom();
+
+
+			if(!fieldChanged && !fieldReader.dead && !fieldReader.won) {
+				if(!makeMove(ticketArray)) {
+					digRandom();
+				}
+			}
 		}
 		lastNumGuesses = numGuesses-lastNumGuesses;
 		System.out.println("iteration " +numIterations + ": " + flagEvents
-				+ " flag events, " + clearEvents + " clear events, and " 
+				+ " flag events, " + clearEvents + " clear events, and "
 				+ lastNumGuesses + " guesses!");
 	}
-	
+
 	public void processField()
 	{
 		for(int column=1;column<fieldReader.columns+1;column++)
@@ -101,11 +103,11 @@ public class MineAI {
 			}
 		}
 	}
-	
+
 	public void processTile(int x, int y)
 	{
 		int number = fieldReader.field[x][y];
-		
+
 		//System.out.print(" number: " + number);
 		//System.out.print(" bombs adjacent: "+numBombsNear(x,y));
 		//System.out.print(" tiles adjacent: "+numFreshSquaresNear(x,y));
@@ -118,7 +120,7 @@ public class MineAI {
 		}
 		//System.out.println();
 	}
-	
+
 	public void clearSurrounding(int x, int y)
 	{
 		clearEvents++;
@@ -132,10 +134,10 @@ public class MineAI {
 			}
 		}
 	}
-	
+
 	public void flagSurrounding(int x, int y)
 	{
-		flagEvents++; 
+		flagEvents++;
 		//System.out.println(" - FLAGGING BOMBS NEAR "+x+", "+y);
 		for(int row=-1;row<2;row++)
 		{
@@ -151,11 +153,11 @@ public class MineAI {
 			}
 		}
 	}
-	
+
 	public int numBombsNear(int x, int y)
 	{
 		int n=0;
-		
+
 		for(int row=-1;row<2;row++)
 		{
 			for (int column=-1;column<2;column++)
@@ -164,14 +166,14 @@ public class MineAI {
 					n++;
 			}
 		}
-		
+
 		return n;
 	}
-	
+
 	public int numFreshSquaresNear(int x, int y)
 	{
 		int n=0;
-		
+
 		for(int row=-1;row<2;row++)
 		{
 			for (int column=-1;column<2;column++)
@@ -184,10 +186,10 @@ public class MineAI {
 				} catch(Exception e){}
 			}
 		}
-		
+
 		return n;
 	}
-	
+
 	public void dig(int x, int y)
 	{
 		if(fieldReader.field[x][y]==0)
@@ -205,19 +207,19 @@ public class MineAI {
 		fieldReader.field[x][y]=-2;
 		fieldChanged=true;
 	}
-	
+
 	public void digRandom()
 	{
 		System.out.println(" -- MAKING RANDOM GUESS -- ");
-		
+
 		if(fieldReader.numEmpty<2)
 		{
 			System.out.println("no seeds. guessing completely randomly");
 			int xToDig = (int)(Math.random()*fieldReader.columns);
 			int yToDig = (int)(Math.random()*fieldReader.rows);
-			
+
 			System.out.println("   guessing square: " + xToDig + ", "+yToDig);
-			
+
 			dig(xToDig,yToDig);
 		}
 		else
@@ -246,7 +248,7 @@ public class MineAI {
 			System.out.println("completed guess with " + iteration + " iterations.");
 		}
 	}
-	
+
 	public boolean numberNear(int x, int y)
 	{
 		for(int row=-1;row<2;row++)
@@ -261,10 +263,10 @@ public class MineAI {
 		}
 		return false;
 	}
-	
+
 	public boolean goodTile(int x, int y)
 	{
-		
+
 		for(int row=-1;row<2;row++)
 		{
 			for (int column=-1;column<2;column++)
@@ -278,20 +280,20 @@ public class MineAI {
 		}
 		return false;
 	}
-	
+
 	public void digRandomSurrounding(int x, int y)
 	{
 		int xOffset;
 		int yOffset;
-		
+
 		do
 			xOffset=(int)(Math.random()*3)-2;
 		while(xOffset==0);
-		
+
 		do
 			yOffset=(int)(Math.random()*3)-2;
 		while(yOffset==0);
-		
+
 		dig(x+xOffset+1,y+yOffset+1);
 	}
 
@@ -300,91 +302,76 @@ public class MineAI {
 		dig(8,8);
 	}
 
-    public void ticketSurrounding(int ticketArray[][], int x, int y)
-    {
-        for(int row = -1; row < 2;row++)
-        {
-            for (int column = -1; column < 2; column++)
-            {
-                if (x+row >= 0 && y+column >= 0 && x+row < MineReader.rows && y+column < MineReader.columns) {
-                    if (ticketArray[x + row][y + column] == 10 && fieldReader.field[x + row][y + column] == 0) {
-                        ticketArray[x + row][y + column] = 0;
-                    }
-                    if (fieldReader.field[x + row][y + column]  == 0) {
-                        ticketArray[x + row][y + column] += 1;
-                    }
-                }
-            }
-        }
-    }
+	public void ticketSurrounding(int ticketArray[][], int x, int y) {
+		for(int row = -1; row < 2;row++) {
+			for (int column = -1; column < 2; column++) {
+				if (x+row >= 0 && y+column >= 0 && x+row < fieldReader.columns+2 && y+column < fieldReader.rows+2) {
+					if (ticketArray[x + row][y + column] == 10 && fieldReader.field[x + row][y + column] == 0) {
+						ticketArray[x + row][y + column] = 0;
+					}
+					if (fieldReader.field[x + row][y + column]  == 0) {
+						ticketArray[x + row][y + column] += 1;
+					}
+				}
+			}
+		}
+	}
 
-    public void fillMatrix(int ticketArray [][]){
-        for(int x = 0; x < ticketArray.length; x++){
-            for (int y = 0; y < ticketArray[x].length; y++) {
-                ticketArray[x][y] = 10;
-            }
-        }
-        for(int m = 0; m < fieldReader.field.length; m++){
-            for (int n = 0; n < fieldReader.field[m].length; n++) {
-                if (fieldReader.field[m][n] > 0) {
-                    ticketSurrounding(ticketArray, m, n);
-                }
-            }
-        }
-    }
+	public void fillMatrix(int ticketArray[][]){
+		for(int x = 0; x < ticketArray.length; x++){
+			for (int y = 0; y < ticketArray[x].length; y++) {
+				ticketArray[x][y] = 10;
+			}
+		}
+		for(int x = 0; x < ticketArray.length; x++){
+			for (int y = 0; y < ticketArray[x].length; y++) {
+				if (fieldReader.field[x][y] > 0) {
+					ticketSurrounding(ticketArray,x, y);
+				}
+			}
+		}
+	}
 
-    public int[] findMin (int ticketArray [][]) {
-        int coord[] = new int[2];
-        int minTicket = 10;
-        for(int x = 0; x < ticketArray.length; x++){
-            for (int y = 0; y < ticketArray[x].length; y++) {
-                if(ticketArray[x][y] < minTicket){
-                    minTicket = ticketArray[x][y];
-                    coord[0] = x;
-                    coord[1] = y;
-                }
-            }
-        }
-        System.out.println(minTicket);
-        System.out.print("X: ");
-        System.out.println(coord[0]);
-        System.out.print("Y: ");
-        System.out.println(coord[1]);
-        System.out.println();
+	public int[] findMin (int ticketArray[][]) {
+		int minTicket = 10;
+		for(int x = 0; x < ticketArray.length; x++){
+			for (int y = 0; y < ticketArray[x].length; y++) {
+				if(ticketArray[x][y] < minTicket){
+					minTicket = ticketArray[x][y];
+					coord[0] = x;
+					coord[1] = y;
+				}
+			}
+		}
+		if(minTicket > threshhold){
+			coord[0] = 10;
+			coord[1] = 10;
+		}
+		return coord;
+	}
 
-        if(minTicket > threshhold){
-            coord[0] = 10;
-            coord[1] = 10;
-            return coord;
-        }
-        return coord;
-    }
+	public boolean makeMove(int ticketArray[][]) {
+		fillMatrix(ticketArray);
+		coord = findMin(ticketArray);
+		printField(ticketArray);
+		if(coord[0] != 10){
+			dig(coord[0],coord[1]);
+			return true;
+		}
+		return false;
+	}
 
-    public void makeMove (int ticketArray[][]) {
-        fillMatrix(ticketArray);
-        int coord[] = findMin(ticketArray);
-        printField(ticketArray);
-        if(coord[0] != 10){
-            //System.out.print(coord[0]);
-            //System.out.print(coord[1]);
-            //System.out.println();
-            dig(coord[0],coord[1]);
-            //fieldReader.click(coord[0] + 1, coord[1] + 1,false);
-        }
-
-    }
-
-    public void printField(int ticketArray[][])
-    {
-        for(int y=ticketArray.length-1;y>=0;y--)
-        {
-            System.out.print("[");
-            for(int x=0;x<ticketArray[y].length-1;x++)
-            {
-                //System.out.println("column: "+x+" row: "+y);
-                System.out.print(ticketArray[x][y]+", ");
-            }
-            System.out.println("]");
-        }
-    }
+	public void printField(int ticketArray[][])
+	{
+		for(int y=ticketArray.length-1;y>=0;y--)
+		{
+			System.out.print("[");
+			for(int x=0;x<ticketArray[y].length-1;x++)
+			{
+				//System.out.println("column: "+x+" row: "+y);
+				System.out.print(ticketArray[x][y]+", ");
+			}
+			System.out.println("]");
+		}
+	}
 }
