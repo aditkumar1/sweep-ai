@@ -32,7 +32,7 @@ public class MineAI {
 		endTime=startTime;
 		fieldReader.init();
 		startTime = System.currentTimeMillis();
-		digRandom();
+		digRandom(false);
 		numGuesses=0;
 		lastNumGuesses=0;
 		numIterations=0;
@@ -81,9 +81,8 @@ public class MineAI {
 
 
 			if(!fieldChanged && !fieldReader.dead && !fieldReader.won) {
-				if(!makeMove(ticketArray)) {
-					digRandom();
-				}
+                if(!makeMove(ticketArray))
+					digRandom(true);
 			}
 		}
 		lastNumGuesses = numGuesses-lastNumGuesses;
@@ -208,7 +207,7 @@ public class MineAI {
 		fieldChanged=true;
 	}
 
-	public void digRandom()
+	public Boolean digRandom(Boolean makeGuessonNeighbor)
 	{
 		System.out.println(" -- MAKING RANDOM GUESS -- ");
 
@@ -221,6 +220,7 @@ public class MineAI {
 			System.out.println("   guessing square: " + xToDig + ", "+yToDig);
 
 			dig(xToDig,yToDig);
+			return true;
 		}
 		else
 		{
@@ -234,7 +234,10 @@ public class MineAI {
 					for(int row=1;row<fieldReader.rows;row++)
 					{
 						//System.out.println("	checking guess eligibility of: "+column+", "+row);
-						if(fieldReader.field[column][row]==0 && numberNear(column,row) && goodTile(column,row))
+						boolean numberNear=numberNear(column,row);
+						if(!makeGuessonNeighbor)numberNear=!numberNear;
+						System.out.println("row-"+row+"column-"+column+"number near-"+numberNear);
+						if(fieldReader.field[column][row]==0 && numberNear)
 						{
 							dig(column,row);
 							dug=true;
@@ -246,6 +249,7 @@ public class MineAI {
 				iteration++;
 			}while(!dug);
 			System.out.println("completed guess with " + iteration + " iterations.");
+			return dug;
 		}
 	}
 
@@ -258,23 +262,6 @@ public class MineAI {
 				if(fieldReader.field[x+column][y+row]>0)
 				{
 					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	public boolean goodTile(int x, int y)
-	{
-
-		for(int row=-1;row<2;row++)
-		{
-			for (int column=-1;column<2;column++)
-			{
-				if(fieldReader.field[x+column][y+row]>0)
-				{
-					if(Math.random()>0.95)
-						return true;
 				}
 			}
 		}
@@ -353,11 +340,13 @@ public class MineAI {
 	public boolean makeMove(int ticketArray[][]) {
 		fillMatrix(ticketArray);
 		coord = findMin(ticketArray);
-		printField(ticketArray);
+//		printField(ticketArray);
 		if(coord[0] != 10){
 			dig(coord[0],coord[1]);
+			clearEvents++;
 			return true;
 		}
+		System.out.println("false");
 		return false;
 	}
 

@@ -67,9 +67,9 @@ public class MineWindow implements ActionListener {
         DefaultCaret caret = (DefaultCaret) consolePn.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
-        TextAreaOutputStream taOutputStream = new TextAreaOutputStream(consolePn, "SweepAI");
+        //TextAreaOutputStream taOutputStream = new TextAreaOutputStream(consolePn, "SweepAI");
 
-        System.setOut(new PrintStream(taOutputStream));
+        //System.setOut(new PrintStream(taOutputStream));
     }
 
     public void actionPerformed(ActionEvent e) {
