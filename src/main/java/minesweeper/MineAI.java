@@ -1,6 +1,9 @@
 package minesweeper;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MineAI {
 	Minesweeper minesweeper;
 	MineReader fieldReader;
@@ -331,17 +334,36 @@ public class MineAI {
 			}
 		}
 		if(minTicket > threshhold){
-			coord[0] = 10;
-			coord[1] = 10;
+			coord[0] = -1;
+			coord[1] = -1;
 		}
 		return coord;
 	}
+    public int[] findMax (int ticketArray[][]) {
+        int maxTicket = Integer.MIN_VALUE;
+        for(int x = 0; x < ticketArray.length; x++){
+            for (int y = 0; y < ticketArray[x].length; y++) {
+                if(ticketArray[x][y] > maxTicket){
+                    maxTicket = ticketArray[x][y];
+                    coord[0] = x;
+                    coord[1] = y;
+                }
+            }
+        }
+        if(maxTicket <= threshhold||maxTicket==10){
+            coord[0] = -1;
+            coord[1] = -1;
+        }
+        return coord;
+    }
 
 	public boolean makeMove(int ticketArray[][]) {
 		fillMatrix(ticketArray);
 		coord = findMin(ticketArray);
-//		printField(ticketArray);
-		if(coord[0] != 10){
+//		if(getOccurence(ticketArray,ticketArray[(coord[0]),(coord[1]))>1)
+//		    return false;
+		printField(ticketArray);
+		if(coord[0] >= 0&&coord[1]>=0){
 			dig(coord[0],coord[1]);
 			clearEvents++;
 			return true;
@@ -349,17 +371,26 @@ public class MineAI {
 		System.out.println("false");
 		return false;
 	}
+	public int getOccurence(int ticketArray[][],int minValue){
+	    int occurence=0;
+	    for(int x = 0; x < ticketArray.length; x++){
+            for (int y = 0; y < ticketArray[x].length; y++) {
+                    if(ticketArray[x][y]==minValue)
+                       occurence++;
+                }
+            }
+            return occurence;
+    }
 
 	public void printField(int ticketArray[][])
 	{
-		for(int y=ticketArray.length-1;y>=0;y--)
-		{
+		for(int x = 0; x < ticketArray.length; x++){
 			System.out.print("[");
-			for(int x=0;x<ticketArray[y].length-1;x++)
-			{
-				//System.out.println("column: "+x+" row: "+y);
-				System.out.print(ticketArray[x][y]+", ");
-			}
+			for (int y = 0; y < ticketArray[x].length; y++) {
+
+                //System.out.println("column: "+x+" row: "+y);
+                System.out.print(ticketArray[x][y] + ", ");
+            }
 			System.out.println("]");
 		}
 	}
