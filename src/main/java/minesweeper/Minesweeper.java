@@ -33,8 +33,7 @@ public class Minesweeper extends Thread {
         } catch (InterruptedException e1) {
         }
 
-        System.out.println("starting ai...");
-
+        System.out.println("Starting AI...");
         locate();
 
         if (readyToRun) {
@@ -45,10 +44,8 @@ public class Minesweeper extends Thread {
             }
 
             mineAI = new MineAI(this);
-
             mineAI.initialize();
             mineAI.mainLoop();
-            //mineAI.test();
         }
     }
 
@@ -56,37 +53,33 @@ public class Minesweeper extends Thread {
         int height = (botY - botOffsetY) - (topY - offsetY);
         int width = (botX - botOffsetX) - (topX + offsetX);
 
-        //System.out.println("window of size: " +width +"x" + height + "found");
-
         Rectangle window = new Rectangle(topX + offsetX, topY - offsetY, width, height);
         Robot robot = new Robot();
 
         BufferedImage screenShot = robot.createScreenCapture(window);
 
         try {
-            File image = new File("screenshot.png");
+            File image = new File("State.png");
             ImageIO.write(screenShot, "png", image);
         } catch (IOException e) {
         }
     }
 
     public void locate() {
-        System.out.println("Locating minesweeper window... \nPlease do not move the window.");
-
+        System.out.println("Locating Minesweeper...");
         String windowName = "Minesweeper X";
         int[] rect;
         readyToRun = true;
         try {
             rect = GetWindowRect.getRect(windowName);
-            System.out.println("corner locations for minesweeper: \n" +
-                    windowName + Arrays.toString(rect));
+            System.out.println("Corner of Minesweeper:\n" + windowName + Arrays.toString(rect));
             topX = rect[0];
             topY = rect[1];
             botX = rect[2];
             botY = rect[3];
 
         } catch (GetWindowRect.WindowNotFoundException e) {
-            System.out.println("Please open minesweeper and try again");
+            System.out.println("Open Minesweeper and try again");
             readyToRun = false;
         } catch (GetWindowRect.GetWindowRectException e) {
             readyToRun = false;

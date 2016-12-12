@@ -40,11 +40,10 @@ public class MineReader {
         try {
             clicker = new Robot();
         } catch (AWTException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        screenshot = new File("screenshot.png");
+        screenshot = new File("State.png");
         try {
             fieldImage = ImageIO.read(screenshot);
         } catch (IOException e) {
@@ -57,11 +56,11 @@ public class MineReader {
         rows = height / 16;
         columns = width / 16;
 
-        System.out.println("detected field of " + columns + "x" + rows);
+        System.out.println("Detected field of " + columns + "x" + rows);
 
         field = new int[columns + 2][rows + 2];
 
-        System.out.println("creating array sized: " + (columns + 2) + ", " + (rows + 2));
+        System.out.println("Creating Array of: " + (columns + 2) + "x" + (rows + 2));
 
         for (int n = 0; n < rows + 2; n++) {
             field[0][n] = -1;
@@ -73,12 +72,11 @@ public class MineReader {
             field[n][rows + 1] = -1;
         }
 
-        //printField();
     }
 
     public void updateField() {
         numFresh = 0;
-        System.out.println("-UPDATING FIELD-");
+        System.out.println("Updating Field:");
         try {
             minesweeper.updateFieldImage();
         } catch (AWTException e) {
@@ -93,7 +91,6 @@ public class MineReader {
 
         for (int x = 1; x < columns + 1; x++)
             for (int y = 1; y < rows + 1; y++) {
-                //System.out.println("row: "+y+" of " + rows + ", column: "+x + " of " +columns);
                 if (field[x][y] == 0 || field[x][y] == -3) {
                     if (field[x][y] == 0)
                         numFresh++;
@@ -106,30 +103,16 @@ public class MineReader {
         }
     }
 
-    public void printField() {
-        for (int y = rows + 1; y >= 0; y--) {
-            System.out.print("[");
-            for (int x = 0; x < columns + 2; x++) {
-                //System.out.println("column: "+x+" row: "+y);
-                System.out.print(field[x][y] + ", ");
-            }
-            System.out.println("]");
-        }
-    }
-
     public int readTile(int x, int y) {
-        int tileType = 0;//0=unknown,-1=empty -2=bomb, 1-8 are numbers
 
-        //System.out.println("tile to read: " + x + ", " + y);
+        int tileType = 0;
 
         int pixelX = (x - 1) * 16;
-        int pixelY = (rows - (y)) * 16;
-
-        //System.out.println("checking pixel color at: " + pixelX + ", "+pixelY);
+        int pixelY = (rows - y) * 16;
 
         String color = "";
-
         int n = 1;
+
         do {
             color = getPixelColor(pixelX + 8, pixelY + n);
             switch (color) {
@@ -189,14 +172,11 @@ public class MineReader {
                 break;
             }
             n++;
-
         } while (n < 15);
-
         return tileType;
     }
 
-    private String getPixelColor(int x, int y)//get pixel color
-    {
+    private String getPixelColor(int x, int y) {
         String color = "empty";
 
         final int clr = fieldImage.getRGB(x, y);
@@ -204,12 +184,9 @@ public class MineReader {
         final int green = (clr & 0x0000ff00) >> 8;
         final int blue = (clr & 0x000000ff);
 
-        if (red == 255 && green == 255 && blue == 255)
-            color = "white";
-        else if (blue == 255 && red == 0 && green == 0)
-            color = "blue";
-        else if (green == 128 && red == 0 && blue == 0)
-            color = "green";
+        if (red == 255 && green == 255 && blue == 255) color = "white";
+        else if (blue == 255 && red == 0 && green == 0) color = "blue";
+        else if (green == 128 && red == 0 && blue == 0) color = "green";
         else if (red == 255 && green == 0 && blue == 0) {
             color = "red";
             int deadCheckColor = (fieldImage.getRGB(x - 4, y + 8) & 0x00ffffff);
@@ -217,32 +194,23 @@ public class MineReader {
                 dead = true;
                 color = "bomb";
             }
-        } else if (blue == 128 && red == 0 && green == 0)
-            color = "purple";
-        else if (red == 128 && green == 0 && blue == 0)
-            color = "brown";
-        else if (red == 0 && green == 128 && blue == 128)
-            color = "teal";
+        } else if (blue == 128 && red == 0 && green == 0) color = "purple";
+        else if (red == 128 && green == 0 && blue == 0) color = "brown";
+        else if (red == 0 && green == 128 && blue == 128) color = "teal";
         else if (red == 0 && green == 0 && blue == 0) {
             color = "black";
-
             int deadCheckColor = (fieldImage.getRGB(x - 4, y + 8) & 0x00ffffff);
-
-            //System.out.println(deadCheckColor);
             if (deadCheckColor == 0) {
                 dead = true;
                 color = "bomb";
             }
-        } else if (red == 128 && green == 128 && blue == 128)
-            color = "gray";
-
+        } else if (red == 128 && green == 128 && blue == 128) color = "gray";
         return color;
     }
 
     public void click(int x, int y, boolean flag) {
-        int mask;
 
-        //System.out.print("\n CLICKING - "+x+", "+y);
+        int mask;
 
         if (!flag)
             mask = InputEvent.BUTTON1_DOWN_MASK;
@@ -256,9 +224,7 @@ public class MineReader {
         pixelX += minesweeper.topX + minesweeper.offsetX;
         pixelY += minesweeper.topY - minesweeper.offsetY;
 
-
         clicker.mouseMove(pixelX, pixelY);
-
         clicker.mousePress(mask);
 
         try {
@@ -266,8 +232,7 @@ public class MineReader {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        clicker.mouseRelease(mask);
 
-        //updateField();
+        clicker.mouseRelease(mask);
     }
 }

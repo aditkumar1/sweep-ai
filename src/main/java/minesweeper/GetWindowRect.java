@@ -7,6 +7,7 @@ import com.sun.jna.win32.*;
 public class GetWindowRect {
 
     public interface User32 extends StdCallLibrary {
+
         User32 INSTANCE = (User32) Native.loadLibrary("user32", User32.class,
                 W32APIOptions.DEFAULT_OPTIONS);
 
@@ -15,8 +16,7 @@ public class GetWindowRect {
         int GetWindowRect(HWND handle, int[] rect);
     }
 
-    public static int[] getRect(String windowName) throws WindowNotFoundException,
-            GetWindowRectException {
+    public static int[] getRect(String windowName) throws WindowNotFoundException, GetWindowRectException {
         HWND hwnd = User32.INSTANCE.FindWindow(null, windowName);
         if (hwnd == null) {
             throw new WindowNotFoundException("", windowName);
