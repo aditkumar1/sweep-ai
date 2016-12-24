@@ -194,7 +194,8 @@ public class MineReader {
                 dead = true;
                 color = "bomb";
             }
-        } else if (blue == 128 && red == 0 && green == 0) color = "purple";
+        }
+        else if (blue == 128 && red == 0 && green == 0) color = "purple";
         else if (red == 128 && green == 0 && blue == 0) color = "brown";
         else if (red == 0 && green == 128 && blue == 128) color = "teal";
         else if (red == 0 && green == 0 && blue == 0) {
@@ -204,7 +205,8 @@ public class MineReader {
                 dead = true;
                 color = "bomb";
             }
-        } else if (red == 128 && green == 128 && blue == 128) color = "gray";
+        }
+        else if (red == 128 && green == 128 && blue == 128) color = "gray";
         return color;
     }
 

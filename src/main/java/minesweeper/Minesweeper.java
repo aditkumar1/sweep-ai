@@ -13,6 +13,7 @@ import java.io.IOException;
 
 public class Minesweeper extends Thread {
 
+    public MineStarter mineStarter;
     boolean readyToRun = false;
 
     int topX, topY, botX, botY;
@@ -24,7 +25,8 @@ public class Minesweeper extends Thread {
     final int botOffsetY = 15;
 
     MineReader mineInterface;
-    MineAI mineAI;
+    HillClimbingMineAI hillClimbingMineAI;
+    PatternMineAI patternMineAI;
 
 
     public void run() {
@@ -42,10 +44,16 @@ public class Minesweeper extends Thread {
             } catch (AWTException e) {
                 e.printStackTrace();
             }
-
-            mineAI = new MineAI(this);
-            mineAI.initialize();
-            mineAI.mainLoop();
+            if(mineStarter.input == 1) {
+                hillClimbingMineAI = new HillClimbingMineAI(this);
+                hillClimbingMineAI.initialize();
+                hillClimbingMineAI.mainLoop();
+            }
+            if(mineStarter.input == 2){
+                patternMineAI = new PatternMineAI(this);
+                patternMineAI.initialize();
+                patternMineAI.mainLoop();
+            }
         }
     }
 
@@ -61,8 +69,7 @@ public class Minesweeper extends Thread {
         try {
             File image = new File("State.png");
             ImageIO.write(screenShot, "png", image);
-        } catch (IOException e) {
-        }
+        } catch (IOException e) {}
     }
 
     public void locate() {

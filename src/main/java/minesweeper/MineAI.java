@@ -284,16 +284,16 @@ public class MineAI {
         }
         return false;
     }
-
-    public int getOccurence(int ticketArray[][], int minValue) {
-        int occurence = 0;
-        for (int x = 0; x < ticketArray.length; x++) {
-            for (int y = 0; y < ticketArray[x].length; y++) {
-                if (ticketArray[x][y] == minValue)
-                    occurence++;
-            }
-        }
-        return occurence;
-    }
+//
+//    public int getOccurence(int ticketArray[][], int minValue) {
+//        int occurence = 0;
+//        for (int x = 0; x < ticketArray.length; x++) {
+//            for (int y = 0; y < ticketArray[x].length; y++) {
+//                if (ticketArray[x][y] == minValue)
+//                    occurence++;
+//            }
+//        }
+//        return occurence;
+//    }
 
 }
